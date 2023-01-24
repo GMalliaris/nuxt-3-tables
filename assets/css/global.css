@@ -1,0 +1,55 @@
+
+.openModal {
+  display: block;
+}
+
+.b-toast {
+  max-width: 250px;
+  margin-bottom: 3rem;
+  margin-left: 1rem;
+  opacity: 0.95;
+}
+
+h4 {
+  padding-right: 0.5rem;
+  margin-block: auto;
+}
+.o-pagelayout {
+  min-height: 100vh;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.2s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.asterisk-label label::after,
+.asterisk::after {
+  content: " *";
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0;
+}
+
+.table-responsive table thead th span.sr-only {
+  display: none;
+}
+/* better responsiveness in the (x) in warning popup, only for small screens*/
+@media only screen and (max-width: 700px) {
+  .alert-dismissible .close {
+    padding-top: 0.2rem !important;
+    padding-right: 0.3rem !important;
+  }
+}
+
+/* Question mark design for additional form field description */
+.help-description {
+  width: 18px;
+  height: 18px;
+  color: lightgrey;
+  margin-left: 2px;
+}
