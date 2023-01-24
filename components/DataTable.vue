@@ -1,18 +1,15 @@
 <template>
-  <b-table :items="provider" :fields="fields"
-           :per-page="context.perPage"
-           :current-page="context.currentPage"
-           :sort-by="context.sortBy"
-           :sort-desc="context.sortDesc"
-           no-provider-paging
-           no-provider-sorting
-           no-provider-filtering />
-  <b-pagination
-      v-model="context.currentPage"
-      :total-rows="100"
-      :per-page="context.perPage"
-      aria-controls="my-table"
-  ></b-pagination>
+  <b-table :items="items" :fields="fields"/>
+  <div class="d-flex">
+    <b-pagination
+        class="mr-2 align-self-center mb-0"
+        v-model="context.currentPage"
+        :total-rows="total"
+        :per-page="context.perPage"
+    ></b-pagination>
+    <b-form-select class="mr-2 d-inline h-auto align-self-center" v-model="context.perPage" :options="[1, 2, 3, 4]" size="sm"></b-form-select>
+    <input type="text" v-model="search">
+  </div>
 </template>
 
 <script lang="ts">
@@ -31,18 +28,10 @@ export default defineNuxtComponent({
 <script lang="ts" setup>
 import { BTable, BPagination } from "bootstrap-vue-next";
 import {PropType, watch} from "@vue/runtime-core";
+import { BFormSelect } from 'bootstrap-vue-next'
+import {AxiosResponse} from "axios";
 
-// function mock(...args: any[]) {
-//   console.log("mock", args)
-//   return [
-//     { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-//     { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-//     { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-//     { age: 38, first_name: 'Jami', last_name: 'Carney' }
-//   ];
-// }
-
-type Context = {
+export type Context = {
   currentPage: number,
   perPage: number,
   sortBy: string,
@@ -51,7 +40,7 @@ type Context = {
 
 const props = defineProps({
   provider: {
-    type: Function,
+    type: Function as PropType<(ctx: Context, search: string) => Promise<AxiosResponse<Array<any>>>>,
     required: true
   },
   fields: {
@@ -62,6 +51,8 @@ const props = defineProps({
 
 const items = ref<any[]>([]);
 const context = ref<Context>({} as Context);
+const total = ref(0)
+const search = ref("")
 
 // function pageChange(e: any) {
 //   console.log(e)
@@ -75,14 +66,21 @@ const context = ref<Context>({} as Context);
 onMounted(() => {
   context.value = {
     currentPage: 1,
-    perPage: 20,
+    perPage: 1,
     sortBy: "id, desc",
     sortDesc: true
   };
 })
 
-// watch(() => context.value,
-//     () => fetchItems(),
-//     {deep: true});
+watch([context, search],
+    ([newContext, newSearch]) => {
+      console.log(JSON.stringify(newContext), JSON.stringify(newSearch))
+      props.provider(newContext, search.value)
+          .then(res => {
+            total.value = Number(res.headers["x-total-count"]);
+            items.value = res.data;
+          })
+    },
+    {deep: true});
 
 </script>

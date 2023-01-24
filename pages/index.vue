@@ -1,8 +1,7 @@
 <template>
   <div>
     <h1>Landing Page</h1>
-    <DataTable test="gmalliaris" :provider="providerFn" :fields="fields"/>
-    <Blah test="gmalliaris" />
+    <DataTable :provider="providerFn" :fields="fields"/>
   </div>
 </template>
 
@@ -13,8 +12,7 @@ export default defineNuxtComponent({
 </script>
 
 <script lang="ts" setup>
-import DataTable from "~/components/DataTable.vue";
-import Blah from "~/components/Blah.vue"
+import DataTable, {Context} from "~/components/DataTable.vue";
 
 
 const fields = [
@@ -34,15 +32,11 @@ const items = [
 
 type User = { id: string, age: number, first_name: string, last_name: string }
 
-function providerFn(ctx?: any): Promise<User[]> {
-  console.log(ctx)
-  return useNuxtApp().$axios.get("/users")
-      .then(res => {
-        return res.data
-      });
+function providerFn(ctx: Context, search: string): Promise<User[]> {
+  return useNuxtApp().$axios.get(`/users?_page=${ctx.currentPage}&_limit=${ctx.perPage}&q=${search}`);
 }
 
-onMounted(() => {
-  providerFn().then(res => (console.log(res)));
-})
+// onMounted(() => {
+//   providerFn().then(res => (console.log(res)));
+// })
 </script>
